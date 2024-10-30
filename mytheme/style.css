@@ -1,0 +1,42 @@
+/*
+Theme Name: My Theme
+Theme URI: http://localhost/theme
+Author: ghadi
+Description: A custom theme using Bootstrap
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: custom-background, custom-logo, custom-menu, bootstrap
+Text Domain: mytheme
+*/
+
+.product-img {
+    max-width: 300px;
+    height: 350px;
+    display: block;
+    margin: 0 auto; /* Center the image horizontally */
+}
+/* Add Flexbox to HTML and Body */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Container for the entire site */
+#page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Content Wrapper to push the footer to the bottom */
+#content-wrap {
+    flex: 1;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #f1f1f1;
+    padding: 20px;
+    text-align: center;
+}
