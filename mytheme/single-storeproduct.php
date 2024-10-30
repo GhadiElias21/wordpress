@@ -19,13 +19,24 @@
                 <p class="text-primary"><strong>Price:</strong> <?php the_field('price'); ?>$</p>
                 <p><strong>Color:</strong> <?php the_field('color'); ?></p>
                 <p><strong>Stock Status:</strong> <?php the_field('stock_status'); ?></p>
-                <p><strong>Stock Status:</strong> <?php the_field('description'); ?></p>
+                <p><strong>Description:</strong> <?php the_field('description'); ?></p>
 
                 <a href="<?php echo home_url('/catalog'); ?>" class="btn btn-dark btn-lg mt-3">Back to Catalog</a>
                 <a href="#" class="btn btn-danger btn-lg mt-3">Add to Cart</a>
 
             </div>
         </div>
+        <!-- Comments Section -->
+        <div class=" mt-5">
+            <h3 class="mb-4">Customer Reviews</h3>
+            <?php
+            if (comments_open() || get_comments_number()) :
+                comments_template();
+            endif;
+            ?>
+        </div>
+
+
     <?php endwhile; else: ?>
         <p><?php _e('Sorry, no product matched your criteria.', 'mytheme'); ?></p>
     <?php endif; ?>

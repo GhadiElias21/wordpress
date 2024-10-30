@@ -19,6 +19,11 @@ function enqueue_bootstrap()
 
 add_action('wp_enqueue_scripts', 'enqueue_bootstrap');
 
+function enable_comments_for_products() {
+    add_post_type_support('storeproduct', 'comments');
+}
+add_action('init', 'enable_comments_for_products');
+
 //function create_product_post_type() {
 //    $labels = array(
 //        'name' => __( 'Products' ),
