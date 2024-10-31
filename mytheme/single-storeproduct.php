@@ -1,5 +1,7 @@
 <?php get_header(); ?>
 
+
+
 <div class="container mt-5">
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
         <div class="row">
@@ -21,14 +23,28 @@
                 <p><strong>Stock Status:</strong> <?php the_field('stock_status'); ?></p>
                 <p><strong>Stock Status:</strong> <?php the_field('description'); ?></p>
 
+                <button class="btn btn-danger btn-lg mt-3 add-to-cart" data-id="<?php echo get_the_ID(); ?>" data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>" data-image="<?php echo $image_url; ?>"  >Add to Cart</button>
                 <a href="<?php echo home_url('/catalog'); ?>" class="btn btn-dark btn-lg mt-3">Back to Catalog</a>
-                <a href="#" class="btn btn-danger btn-lg mt-3">Add to Cart</a>
-
             </div>
         </div>
+<<<<<<< Updated upstream
+=======
+
+        <!-- Comments Section -->
+        <div class="mt-5">
+            <h3 class="mb-4">Customer Reviews</h3>
+            <?php
+            if (comments_open() || get_comments_number()) :
+                comments_template();
+            endif;
+            ?>
+        </div>
+
+>>>>>>> Stashed changes
     <?php endwhile; else: ?>
         <p><?php _e('Sorry, no product matched your criteria.', 'mytheme'); ?></p>
     <?php endif; ?>
 </div>
 
 <?php get_footer(); ?>
+
