@@ -1,5 +1,6 @@
-<?php get_header(); ?>
-
+<?php get_header();
+$product_link = get_permalink(get_the_ID());
+?>
 
 
 <div class="container mt-5">
@@ -23,7 +24,7 @@
                 <p><strong>Stock Status:</strong> <?php the_field('stock_status'); ?></p>
                 <p><strong>Stock Status:</strong> <?php the_field('description'); ?></p>
 
-                <button class="btn btn-danger btn-lg mt-3 add-to-cart" data-id="<?php echo get_the_ID(); ?>" data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>" data-image="<?php echo $image_url; ?>"  >Add to Cart</button>
+                <button class="btn btn-danger btn-lg mt-3 add-to-cart" data-id="<?php echo get_the_ID(); ?>" data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>" data-image="<?php echo $image_url; ?>" data-link="<?php echo esc_url($product_link); ?>" >Add to Cart</button>
                 <a href="<?php echo home_url('/catalog'); ?>" class="btn btn-dark btn-lg mt-3">Back to Catalog</a>
             </div>
         </div>
