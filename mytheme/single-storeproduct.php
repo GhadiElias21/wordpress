@@ -27,8 +27,7 @@
                 <a href="<?php echo home_url('/catalog'); ?>" class="btn btn-dark btn-lg mt-3">Back to Catalog</a>
             </div>
         </div>
-<<<<<<< Updated upstream
-=======
+
 
         <!-- Comments Section -->
         <div class="mt-5">
@@ -40,7 +39,6 @@
             ?>
         </div>
 
->>>>>>> Stashed changes
     <?php endwhile; else: ?>
         <p><?php _e('Sorry, no product matched your criteria.', 'mytheme'); ?></p>
     <?php endif; ?>
