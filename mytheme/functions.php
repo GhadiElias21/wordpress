@@ -62,6 +62,7 @@ function handle_add_to_cart() {
         ));
     }
 
+
     wp_send_json_error(array('message' => 'Failed to add product'));
 }
 add_action('wp_ajax_add_to_cart', 'handle_add_to_cart');
@@ -119,4 +120,11 @@ function handle_remove_from_cart() {
 }
 add_action('wp_ajax_remove_from_cart', 'handle_remove_from_cart');
 add_action('wp_ajax_nopriv_remove_from_cart', 'handle_remove_from_cart');
+=======
+function enable_comments_for_products() {
+    add_post_type_support('storeproduct', 'comments');
+}
+add_action('init', 'enable_comments_for_products');
+
+
 
