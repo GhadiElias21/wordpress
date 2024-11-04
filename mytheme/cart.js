@@ -1,3 +1,4 @@
+
 class ShoppingCart {
     constructor() {
         this.cart = this.loadCart() || [];
@@ -46,18 +47,22 @@ class ShoppingCart {
             },
             success: (response) => {
                 if (response.success) {
-                    // Check if the product already exists in the local cart
                     const existingProduct = this.cart.find(item => item.id === product.id);
                     if (existingProduct) {
-                        existingProduct.quantity += 1; // Increment quantity for existing product
+                        existingProduct.quantity += 1;
                     } else {
-                        product.quantity = 1; // Initialize quantity for new product
-                        this.cart.push(product); // Add new product to cart
+                        product.quantity = 1;
+                        this.cart.push(product);
                     }
-                    this.updateCart(); // Update the cart UI
+                    this.updateCart();
+                } else {
+                    alert('Failed to add item to cart: ' + response.data);
                 }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error adding item to cart:', status, error);
+                alert('An error occurred while adding the item to the cart. Please try again later.');
             }
-
         });
     }
     changeQuantity(productId, quantity) {
@@ -81,11 +86,16 @@ class ShoppingCart {
                             product.quantity = quantity;
                         }
                         this.updateCart();
+                    }else {
+                        alert('Failed to change the quantity: ' + response.data);
                     }
+                },
+                error: (xhr, status, error) => {
+                    console.error('Error while changing the item quanitity:', status, error);
+                    alert('An error occurred while adding the item to the cart. Please try again later.');
                 }
             });
-        }
-    }
+        }}
 
 
     removeItem(productId) {
@@ -100,7 +110,13 @@ class ShoppingCart {
                 if (response.success) {
                     this.cart = this.cart.filter(item => item.id !== productId);
                     this.updateCart();
+                }else {
+                    alert('Failed to remove the item: ' + response.data);
                 }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error while removing an item:', status, error);
+                alert('An error occurred while removing an item. Please try again later.');
             }
         });
     }
@@ -117,6 +133,16 @@ class ShoppingCart {
         this.updateCartCount();
         this.updateCartTotal();
         this.renderCartItems();
+    }
+
+    deleteCookie(name) {
+        this.setCookie(name, '', -1); // Set the cookie with an expiration date in the past
+    }
+    clearCart() {
+        this.cart = [];
+        this.deleteCookie('shoppingCart');
+        this.updateCart();
+        jQuery('#cartModal').modal('hide');
     }
 
     updateCartCount() {
@@ -160,11 +186,11 @@ class ShoppingCart {
             cartItems.appendChild(li);
         });
     }
+
 }
 
 // Initialize the shopping cart
 document.addEventListener('DOMContentLoaded', function () {
-
     const cart = new ShoppingCart();
 
     // Event listener for all "Add to Cart" buttons
@@ -185,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             };
             cart.addItem(product);
+
         });
     });
 
@@ -207,5 +234,68 @@ document.addEventListener('DOMContentLoaded', function () {
             const productId = target.getAttribute('data-id');
             cart.removeItem(productId);
         }
+    });
+    document.getElementById('place-order-button').addEventListener('click', function () {
+
+        if (cart.cart.length === 0) {
+
+            alert('Your cart is empty. Please add items to your cart before placing an order.');
+
+            return;
+
+        }
+
+        const productData = cart.cart.map(item => {
+
+            return `${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`;
+
+        }).join('\n'); // Join with new line for better readability
+
+        document.getElementById('products').value = JSON.stringify(cart.cart);
+        jQuery('#userDetailsModal').modal('show');
+    });
+
+    document.getElementById('order-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let fullName = document.getElementById('full_name').value.trim();
+        let email = document.getElementById('email').value;
+
+        if (fullName === '') {
+            alert('Full Name cannot be empty.');
+            return;
+        }
+
+        let products = JSON.parse(document.getElementById('products').value);
+        let totalAmount = products.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+
+
+        jQuery.ajax({
+            url: ajax_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'create_order',
+                full_name: fullName,
+                email: email,
+                products: JSON.stringify(products),
+                total_amount: totalAmount,
+
+            },
+            success: function (response) {
+                if (response.success) {
+                    console.log('AJAX request successful', response);
+                    cart.clearCart();
+
+                    alert('Order placed successfully!');
+                    jQuery('#userDetailsModal').modal('hide');
+                    document.getElementById('order-form').reset();
+                } else {
+                    alert ('Error: ' + response.data)
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(error)
+            }
+        });
     });
 });

@@ -4,6 +4,7 @@ $image = get_field('image');
 $image_url = $image ? esc_url($image['url']) : '';
 $image_alt = $image ? esc_attr($image['alt']) : '';
 $product_link = get_permalink(get_the_ID());
+
 ?>
 
 <div class="col-md-4 mb-4">
