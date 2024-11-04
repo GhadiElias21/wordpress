@@ -10,7 +10,7 @@ $product_link = get_permalink();
 <div class="col-md-4 mb-4">
     <div class="card h-100">
         <?php if ($image_url) : ?>
-            <img src="<?php echo $image_url; ?>" alt="<?php echo $image_alt; ?>" class="card-img-top" />
+            <img  height="380px"  src="<?php echo $image_url; ?>" alt="<?php echo $image_alt; ?>"  />
         <?php endif; ?>
         <div class="card-body d-flex flex-column">
             <h5 class="card-title"><?php the_field('name'); ?></h5>
