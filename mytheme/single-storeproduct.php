@@ -2,6 +2,7 @@
 $product_link = get_permalink(get_the_ID());
 ?>
 
+
 <div class="container mt-5">
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
         <div class="row">
@@ -28,8 +29,17 @@ $product_link = get_permalink(get_the_ID());
 
             </div>
         </div>
+
+
+        <!-- Comments Section -->
+        <div class="mt-5">
+
+
+            </div>
+        </div>
         <!-- Comments Section -->
         <div class=" mt-5">
+
             <h3 class="mb-4">Customer Reviews</h3>
             <?php
             if (comments_open() || get_comments_number()) :
@@ -45,3 +55,4 @@ $product_link = get_permalink(get_the_ID());
 </div>
 
 <?php get_footer(); ?>
+
