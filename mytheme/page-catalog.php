@@ -8,7 +8,7 @@
         <div class="row">
             <?php
             $args = array(
-                'post_type' => 'storeProduct',
+                'post_type' => 'product',
                 'posts_per_page' => 10,
             );
             $product_query = new WP_Query($args);
