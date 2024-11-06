@@ -7,22 +7,24 @@
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
-<nav class="navbar  navbar-expand-lg navbar-light bg-light mt-4 fixed-top">
+<nav class="navbar  navbar-expand-lg navbar-light bg-light  ">
     <a class="navbar-brand" href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="<?php echo home_url(); ?>">Main</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?php echo home_url('/catalog'); ?>">Catalog</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?php echo home_url('/personal-account'); ?>">Personal account</a>
-            </li>
+            <ul class="navbar-nav bg-gray-500">
+
+                <?php
+                wp_nav_menu(array(
+                    'theme_location' => 'primary',
+                    'container' => false,
+                    'menu_class' => 'navbar-nav',
+                    'items_wrap' => '%3$s',
+                ));
+                ?>
+            </ul>
             <li class="nav-item">
                 <a class="nav-link" href="#" id="cart-icon" data-toggle="modal" data-target="#cartModal">
                     <div class="cart-container">

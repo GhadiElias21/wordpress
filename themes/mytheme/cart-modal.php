@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <ul id="cart-items" class="list-group mb-3"></ul>
-                <p class="mt-3"><strong>Total:</strong> <span id="cart-total" class="font-weight-bold text-success"></span></p>
+                <p class="mt-3"><strong>Total:</strong> <span id="cart-total" class="font-weight-bold text-success">0</span></p>
                 <div id="empty-cart-message" class="alert alert-warning d-none" role="alert">
                     Your cart is currently empty. Add items to your cart to see them here!
                 </div>

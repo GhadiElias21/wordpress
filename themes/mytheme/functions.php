@@ -1,7 +1,5 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require_once get_template_directory() . '/product-rating-widget.php';
 
 function mytheme_setup()
 {
@@ -13,34 +11,46 @@ function mytheme_setup()
 
 add_action('after_setup_theme', 'mytheme_setup');
 
-function enqueue_bootstrap()
+function enqueue_styles()
 {
     wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css');
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), null, true);
     wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css', array(), null);
     wp_enqueue_style('custom-style', get_template_directory_uri() . '/style.css');
+    wp_enqueue_style('custom-menu-styles', get_template_directory_uri() . '/custom-menu-styles.css');
+     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
 }
 
-add_action('wp_enqueue_scripts', 'enqueue_bootstrap');
-add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
-function enqueue_custom_scripts()
-{
-    wp_enqueue_script('jquery'); // Load jQuery
-    wp_enqueue_script(
-        'shopping-cart',
-        get_template_directory_uri() . '/cart.js',
-        array('jquery'), // Make jQuery a dependency
-        null,
-        true // Load script in footer
-    );
 
-    wp_localize_script('shopping-cart', 'ajax_obj', array(
-        'ajax_url' => admin_url('admin-ajax.php')
-    ));
+add_action('wp_enqueue_scripts', 'enqueue_styles');
+add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
+
+function enqueue_custom_scripts() {
+
+        wp_enqueue_script('jquery');
+        wp_enqueue_script(
+            'shopping-cart',
+            get_template_directory_uri() . '/cart.js',
+            array('jquery'),
+            null,
+            true
+        );
+        wp_enqueue_script(
+            'star-rating',
+            get_template_directory_uri() . '/includes/js/star-rating.js',
+            array('jquery'),
+            null,
+            true
+        );
+        wp_localize_script('shopping-cart', 'ajax_obj', array(
+            'ajax_url' => admin_url('admin-ajax.php')
+        ));
+
 }
-
 add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
+
+
 function handle_add_to_cart()
 {
     if (isset($_POST['product'])) {
@@ -170,15 +180,6 @@ function create_order_post_type() {
 
 add_action('init', 'create_order_post_type', 0);
 
-
-//add_action('init', function() {
-//    global $wp_post_types;
-//    echo '<pre>';
-//    print_r(array_keys($wp_post_types));
-//    echo '</pre>';
-//});
-
-
 function create_order()
 {
     if (!isset($_POST['full_name'], $_POST['email'], $_POST['products'], $_POST['total_amount'])) {
@@ -189,7 +190,6 @@ function create_order()
     $full_name = sanitize_text_field($_POST['full_name']);
     $email = sanitize_email($_POST['email']);
 
-    // Decode the JSON string of products
     $products = json_decode(stripslashes($_POST['products']), true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         wp_send_json_error('Invalid JSON format for products');
@@ -198,7 +198,6 @@ function create_order()
 
     $total_amount = sanitize_text_field($_POST['total_amount']);
 
-    // Create the custom order post
     $order_id = wp_insert_post(array(
         'post_type' => 'custom_order',
         'post_title' => 'Order for ' . $full_name,
@@ -210,10 +209,8 @@ function create_order()
         return;
     }
 
-    // Store the product data as a JSON string
     update_post_meta($order_id, 'product_data', wp_slash(json_encode($products)));
 
-    // Update custom fields
     update_field('full_name', $full_name, $order_id);
     update_field('email', $email, $order_id);
     update_field('total_amount', $total_amount, $order_id);
@@ -245,7 +242,7 @@ function custom_order_column($column, $post_id)
             echo '<span style="color: blue;">' . esc_html(get_field('email', $post_id)) . '</span>';
             break;
         case 'products':
-            $product_data = get_post_meta($post_id, 'product_data', true); // Retrieve the product data
+            $product_data = get_post_meta($post_id, 'product_data', true);
             $products = json_decode($product_data, true);
             if ($products && is_array($products)) {
                 foreach ($products as $product) {
@@ -266,3 +263,59 @@ function custom_order_column($column, $post_id)
 }
 
 add_action('manage_custom_order_posts_custom_column', 'custom_order_column', 10, 2);
+
+
+function my_theme_register_menus() {
+    register_nav_menus(
+        array(
+            'primary' => __('Primary Menu', 'my-theme'),
+        )
+    );
+}
+add_action('after_setup_theme', 'my_theme_register_menus');
+
+
+
+function handle_product_rating() {
+    if (isset($_POST['rating']) && isset($_POST['product_id']) && is_user_logged_in()) {
+        $product_id = intval($_POST['product_id']);
+        $rating = intval($_POST['rating']);
+
+        $ratings = get_post_meta($product_id, 'product_ratings', true);
+        if (!$ratings) {
+            $ratings = array();
+        }
+
+        $user_id = get_current_user_id();
+        $ratings[$user_id] = $rating;
+
+        update_post_meta($product_id, 'product_ratings', $ratings);
+
+        $average_rating = array_sum($ratings) / count($ratings);
+        update_post_meta($product_id, 'rating', $average_rating);
+
+        wp_redirect(get_permalink($product_id));
+        exit;
+    }
+}
+add_action('init', 'handle_product_rating');
+
+
+
+function my_custom_sidebar() {
+    register_sidebar( array(
+        'name'          => 'Product Archive Sidebar',
+        'id'            => 'product-archive-sidebar',
+        'before_widget' => '<div class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ) );
+}
+add_action( 'widgets_init', 'my_custom_sidebar' );
+
+function register_product_rating_widget() {
+    register_widget( 'Product_Rating_Widget' );
+}
+add_action( 'widgets_init', 'register_product_rating_widget' );
+?>

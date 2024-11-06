@@ -4,6 +4,7 @@ $image = get_field('image');
 $image_url = $image ? esc_url($image['url']) : '';
 $image_alt = $image ? esc_attr($image['alt']) : '';
 $product_link = get_permalink(get_the_ID());
+$rating = get_field('rating');
 
 ?>
 
@@ -18,12 +19,22 @@ $product_link = get_permalink(get_the_ID());
             <p class="card-text"><strong>Color:</strong> <?php the_field('color'); ?></p>
             <p class="card-text"><strong>Size:</strong> <?php the_field('size'); ?></p>
             <p class="card-text"><strong>Stock Status:</strong> <?php the_field('stock_status'); ?></p>
-            <div class="mt-auto">
-                <button class="btn btn-danger btn-lg  add-to-cart" data-id="<?php echo get_the_ID(); ?>"
-                        data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>" data-image="<?php echo $image_url; ?>" data-link="<?php echo esc_url($product_link); ?>" >Add to Cart
-                </button>
-                <a href="<?php echo esc_url($product_link); ?>" class="btn btn-primary">Learn More</a>
+            <div class="star-rating non-clickable">
+                <?php
+                $stars = range(1, 5);
+                foreach ($stars as $i) : ?>
+                    <span class="fa fa-star <?php echo ($i <= $rating) ? 'checked' : ''; ?>"></span>
+                <?php endforeach; ?>
             </div>
+
+            <div class="">
+                <button class="btn btn-danger btn-lg add-to-cart" data-id="<?php echo get_the_ID(); ?>"
+                        data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>"
+                        data-image="<?php echo $image_url; ?>" data-link="<?php echo esc_url($product_link); ?>">Add to
+                    Cart
+                </button>
+                <a href="<?php echo esc_url($product_link); ?>" class="btn btn-primary">Learn More</a></div>
         </div>
+
     </div>
 </div>
