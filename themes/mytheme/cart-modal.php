@@ -22,31 +22,22 @@
         </div>
     </div>
 </div>
-
-<!-- User Details Modal -->
 <div class="modal fade" id="userDetailsModal" tabindex="-1" role="dialog" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userDetailsModalLabel">Enter Your Details</h5>
+                <h5 class="modal-title" id="userDetailsModalLabel">Order Confirmation</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="order-form">
-                    <div class="form-group">
-                        <label for="full_name">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <input type="hidden" id="products" name="products" value="">
-                    <button type="submit" class="btn btn-primary">Submit Order</button>
-                </form>
+                <p>Your order will be placed using the following details:</p>
+                <p id="confirmation-details"></p>
+                <input type="hidden" id="products" name="products" value="">
+                <button type="submit" class="btn btn-primary" id="confirm-order-button">Confirm Order</button>
             </div>
         </div>
     </div>
 </div>
+

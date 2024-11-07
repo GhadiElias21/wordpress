@@ -5,5 +5,6 @@ index.php
 /upgrade/
 /upgrade-temp-backup/
 /uploads/
-/themes/.idea/
 /plugins/order-status-manager/.idea/
+/themes/.idea/
+/.idea/

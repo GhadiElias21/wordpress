@@ -12,11 +12,11 @@ registerBlockType('my-plugin/product-rating', {
                     value={attributes.title}
                     onChange={(value) => setAttributes({ title: value })}
                 />
-                {/* You can also add a preview of the ratings here */}
+
             </div>
         );
     },
     save() {
-        return null; // Server-side rendering
+        return null;
     }
 });

@@ -30,7 +30,7 @@ class Product_Rating_Widget extends WP_Widget {
                 $rating = get_post_meta(get_the_ID(), 'rating', true);
                 echo '<li class="top-rated-product">';
                 echo '<a href="' . get_permalink() . '" class="product-link">' . get_the_title() . '</a>';
-                echo '<span class="product-rating">'  . esc_html($rating) . ' ★ </span>';
+                echo '<span class="product-rating">'  . esc_html(number_format($rating,1)  ) . ' ★ </span>';
                 echo '</li>';
             }
             echo '</ul>';
