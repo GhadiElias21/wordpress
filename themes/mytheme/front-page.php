@@ -5,7 +5,18 @@
         <p class="lead"><?php bloginfo('description'); ?></p>
     </div>
 </div>
+<div class="product-archive">
+    <div class="content-area">
+        <h1 class="widget-title">top rated products</h1>
 
+    </div>
+
+    <aside class="sidebar-area">
+        <?php if (is_active_sidebar('product-archive-sidebar')) : ?>
+            <?php dynamic_sidebar('product-archive-sidebar'); ?>
+        <?php endif; ?>
+    </aside>
+</div>
 <div id="catalog" class="container my-5">
     <h2 class="text-center">Featured Products</h2>
 

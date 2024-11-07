@@ -1,0 +1,22 @@
+.navbar-nav {
+    display: flex;
+    gap:20px;
+
+}
+
+.navbar-nav .nav-item {
+    color:black;
+
+    margin-right: 20px;
+}
+
+.navbar-nav .nav-item a {
+    color:black;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-item a:hover {
+    color: #f39c12;
+}
+
