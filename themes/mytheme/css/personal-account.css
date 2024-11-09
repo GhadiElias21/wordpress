@@ -1,0 +1,141 @@
+/* Custom CSS for Order History */
+.order-history-container {
+    margin-top: 30px;
+}
+
+.order-history-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.order-history-container ul.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.order-history-container .list-group-item {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-history-container .list-group-item h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.order-history-container .list-group-item ul.product-list {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.order-history-container .list-group-item ul.product-list li {
+    margin-bottom: 5px;
+}
+
+.order-history-container .list-group-item strong {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #007bff;
+}
+
+.order-history-container .list-group-item span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.order-history-container .no-orders {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+}
+
+.order-history-container .no-orders {
+    text-align: center;
+    font-size: 16px;
+    color: red;
+
+    margin-top: 20px;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.order-title {
+    font-weight: bold;
+    color: #0a7aff;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.order-value {
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.product-list {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+}
+
+.product-list li {
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.product-list li:last-child {
+    border-bottom: none;
+}
+
+.product-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.status {
+
+    font-weight: bold;
+}
+
+.status.pending {
+    background-color: orange;
+}
+
+.status.completed {
+    background-color: green;
+}
+
+.status.canceled {
+    background-color: red;
+}
+
+.status-value {
+    color: white;
+    font-weight: bold;
+}
+
+.status-title {
+    color: white;
+    font-weight: bold;
+}
+

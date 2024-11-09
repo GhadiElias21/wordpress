@@ -1,5 +1,5 @@
 <?php
-require_once get_template_directory() . '/product-rating-widget.php';
+require_once get_template_directory() . '/widgets/product-rating-widget.php';
 
 function mytheme_setup()
 {
@@ -16,9 +16,13 @@ function enqueue_styles()
     wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css');
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), '', true);
     wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css');
-    wp_enqueue_style('custom-style', get_template_directory_uri() . '/style.css');
-    wp_enqueue_style('custom-menu-styles', get_template_directory_uri() . '/custom-menu-styles.css');
-     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+    wp_enqueue_style('custom-style', get_template_directory_uri() . 'style.css');
+    wp_enqueue_style('custom-rating', get_template_directory_uri() . '/css/rating.css');
+    wp_enqueue_style('custom-cart-style', get_template_directory_uri() . '/css/cart.css');
+    wp_enqueue_style('custom-menu-styles', get_template_directory_uri() . '/css/custom-menu-styles.css');
+    wp_enqueue_style('personal-account', get_template_directory_uri() . '/css/personal-account.css');
+
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
 
 }
 
@@ -27,22 +31,33 @@ add_action('wp_enqueue_scripts', 'enqueue_styles');
 add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 
 function enqueue_custom_scripts() {
+    wp_enqueue_script('jquery');
 
-        wp_enqueue_script('jquery');
-        wp_enqueue_script(
-            'shopping-cart',
-            get_template_directory_uri() . '/cart.js',
-            array('jquery'),
-            null,
-            true
-        );
-        wp_enqueue_script(
-            'star-rating',
-            get_template_directory_uri() . '/includes/js/star-rating.js',
-            array('jquery'),
-            null,
-            true
-        );
+    wp_enqueue_script(
+        'shopping-cart',
+        get_template_directory_uri() . '/js/cart.js',
+        array('jquery'),
+        null,
+        true
+    );
+
+    wp_enqueue_script(
+        'personal-account-js',
+        get_template_directory_uri() . '/js/personal-account.js',
+        array('jquery'),
+        null,
+        true
+    );
+
+    wp_enqueue_script(
+        'star-rating',
+        get_template_directory_uri() . '/includes/js/star-rating.js',
+        array('jquery'),
+        null,
+        true
+    );
+
+    // Localize script for shopping-cart
     wp_localize_script('shopping-cart', 'ajax_obj', array(
         'ajax_url' => admin_url('admin-ajax.php'),
         'current_user' => array(
@@ -50,9 +65,17 @@ function enqueue_custom_scripts() {
             'user_email' => is_user_logged_in() ? wp_get_current_user()->user_email : ''
         )
     ));
-}
-add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 
+    if (is_page_template('page-personal-account.php')) {
+        wp_localize_script('personal-account-js', 'userData', array(
+            'email' => wp_get_current_user()->user_email,
+            'restUrl' => esc_url(rest_url('custom/v1/orders')),
+            'nonce' => wp_create_nonce('wp_rest')
+        ));
+    }
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 
 function handle_add_to_cart()
 {
@@ -200,7 +223,7 @@ function create_order()
     $order_id = wp_insert_post(array(
         'post_type' => 'custom_order',
         'post_title' => 'Order for ' . $full_name,
-        'post_status' => 'publish'
+        'post_status' => 'pending'
     ));
 
     if (is_wp_error($order_id)) {
@@ -317,6 +340,66 @@ function register_product_rating_widget() {
     register_widget( 'Product_Rating_Widget' );
 }
 add_action( 'widgets_init', 'register_product_rating_widget' );
-?>
 
+function register_custom_rest_routes() {
+    register_rest_route('custom/v1', '/orders', array(
+        'methods' => 'POST',
+        'callback' => 'handle_get_user_orders',
+        'permission_callback' => function () {
+            return is_user_logged_in();
+        }
+    ));
+}
+add_action('rest_api_init', 'register_custom_rest_routes');
 
+function handle_get_user_orders(WP_REST_Request $request) {
+    $current_user = wp_get_current_user();
+    $email = sanitize_email($request->get_param('email'));
+
+    if ($email !== $current_user->user_email) {
+        return new WP_Error('unauthorized', 'Unauthorized access', array('status' => 401));
+    }
+
+    $orders = get_posts(array(
+        'post_type' => 'custom_order',
+        'meta_key' => 'email',
+        'meta_value' => $email,
+        'post_status' => 'any',
+    ));
+
+    if (empty($orders)) {
+        return rest_ensure_response([]);
+    }
+
+    $order_data = array();
+    foreach ($orders as $order) {
+        $products = get_post_meta($order->ID, 'product_data', true);
+        $total_amount = get_field('total_amount', $order->ID);
+        $status = get_post_status($order->ID);
+
+        switch ($status) {
+            case 'publish':
+                $status = 'Completed';
+                break;
+            case 'pending':
+                $status = 'Pending';
+                break;
+            case 'draft':
+                $status = 'Canceled';
+                break;
+            default:
+                $status = ucfirst($status);
+                break;
+        }
+
+        $order_data[] = array(
+            'order_id' => $order->ID,
+            'order_date' => get_the_date('', $order),
+            'products' => json_decode($products, true),
+            'total_amount' => $total_amount,
+            'status' => $status
+        );
+    }
+
+    return rest_ensure_response($order_data);
+}

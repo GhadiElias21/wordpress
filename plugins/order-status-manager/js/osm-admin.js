@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     alert(response.data);
-
+                    fetchOrderData()
                     switch (newStatus) {
                         case 'Pending':
                             $select.css('background-color', 'orange');

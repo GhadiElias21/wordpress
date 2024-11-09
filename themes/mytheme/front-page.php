@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 <div class="jumbotron jumbotron-fluid text-center bg-dark text-white">
-    <div class="container">
+    <div >
         <h1 class="display-4"><?php bloginfo('name'); ?></h1>
         <p class="lead"><?php bloginfo('description'); ?></p>
     </div>
@@ -17,7 +17,7 @@
         <?php endif; ?>
     </aside>
 </div>
-<div id="catalog" class="container my-5">
+<div id="catalog" class=" my-5 container">
     <h2 class="text-center">Featured Products</h2>
 
         <div class="row">
@@ -41,7 +41,7 @@
 
 
 <div class="container-fluid bg-light py-5">
-    <div class="container">
+    <div >
         <div class="row">
             <div class="col-md-6">
                 <h3>About Us</h3>
@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<div class="container my-5">
+<div class="my-5">
     <h2 class="text-center mb-4">Customer Testimonials</h2>
     <div class="row">
         <div class="col-md-4 d-flex align-items-stretch">

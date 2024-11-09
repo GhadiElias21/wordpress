@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
+
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php bloginfo('name'); ?></title>
     <?php wp_head(); ?>
 </head>
+
 <body <?php body_class(); ?>>
+
 <nav class="navbar  navbar-expand-lg navbar-light bg-light  ">
     <a class="navbar-brand" href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +29,14 @@
                 ));
                 ?>
             </ul>
-            <li class="nav-item">
+            <nav class="nav-item">
                 <a class="nav-link" href="#" id="cart-icon" data-toggle="modal" data-target="#cartModal">
                     <div class="cart-container">
                         <span id="cart-count" class="badge badge-primary">0</span>
                         <i class="bi bi-cart"></i>
                     </div>
                 </a>
-            </li>
+            </nav>
         </ul>
     </div>
 </nav>

@@ -13,6 +13,7 @@ $rating = get_field('rating');
         <?php if ($image_url) : ?>
             <img height="380px" src="<?php echo $image_url; ?>" alt="<?php echo $image_alt; ?>"/>
         <?php endif; ?>
+
         <div class="card-body d-flex flex-column">
             <h5 class="card-title"><?php the_field('name'); ?></h5>
             <p class="card-text"><strong>Price:</strong> <?php the_field('price'); ?>$</p>
@@ -27,7 +28,7 @@ $rating = get_field('rating');
                 <?php endforeach; ?>
             </div>
 
-            <div class="">
+            <div>
                 <button class="btn btn-danger btn-lg add-to-cart" data-id="<?php echo get_the_ID(); ?>"
                         data-name="<?php the_field('name'); ?>" data-price="<?php the_field('price'); ?>"
                         data-image="<?php echo $image_url; ?>" data-link="<?php echo esc_url($product_link); ?>">Add to

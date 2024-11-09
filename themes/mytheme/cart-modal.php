@@ -41,3 +41,5 @@
     </div>
 </div>
 
+<div id="toast-container" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <!-- Position it -->

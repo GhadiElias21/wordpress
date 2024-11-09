@@ -1,4 +1,3 @@
-
 class ShoppingCart {
     constructor() {
         this.cart = this.loadCart() || [];
@@ -199,136 +198,138 @@ class ShoppingCart {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const cart = new ShoppingCart();
-    const toastTrigger = document.getElementById('liveToastBtn')
-    const toastLiveExample = document.getElementById('liveToast')
+        const cart = new ShoppingCart();
 
 
-    console.log(ajax_obj.current_user.display_name)
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function () {
-            const productId = this.getAttribute('data-id');
-            const productName = this.getAttribute('data-name');
-            const productImage = this.getAttribute('data-image');
-            const productPrice = parseFloat(this.getAttribute('data-price'));
-            const productLink = this.getAttribute('data-link');
-            const product = {
-                id: productId,
-                name: productName,
-                price: productPrice,
-                quantity: 1,
-                image: productImage,
-                link: productLink
-            };
-            cart.addItem(product);
+        console.log(ajax_obj.current_user.display_name)
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-id');
+                const productName = this.getAttribute('data-name');
+                const productImage = this.getAttribute('data-image');
+                const productPrice = parseFloat(this.getAttribute('data-price'));
+                const productLink = this.getAttribute('data-link');
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    quantity: 1,
+                    image: productImage,
+                    link: productLink
+                };
+                cart.addItem(product);
+            });
         });
-    });
 
-    const cartItemsElement = document.getElementById('cart-items');
-    if (cartItemsElement) {
-        cartItemsElement.addEventListener('click', function (event) {
-            const target = event.target;
+        const cartItemsElement = document.getElementById('cart-items');
+        if (cartItemsElement) {
+            cartItemsElement.addEventListener('click', function (event) {
+                const target = event.target;
 
-            if (target.classList.contains('change-quantity')) {
-                const productId = target.getAttribute('data-id');
-                const action = target.getAttribute('data-action');
+                if (target.classList.contains('change-quantity')) {
+                    const productId = target.getAttribute('data-id');
+                    const action = target.getAttribute('data-action');
 
-                if (action === 'increase') {
-                    cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity + 1);                } else if (action === 'decrease') {
-                    cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity - 1);
+                    if (action === 'increase') {
+                        cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity + 1);
+                    } else if (action === 'decrease') {
+                        cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity - 1);
+                    }
                 }
-            }
 
-            if (target.classList.contains('remove-item')) {
-                const productId = target.getAttribute('data-id');
-                cart.removeItem(productId);
-            }
-        });
-    } else {
-        console.log("Element with ID 'cart-items' not found.");
-    }
+                if (target.classList.contains('remove-item')) {
+                    const productId = target.getAttribute('data-id');
+                    cart.removeItem(productId);
+                }
+            });
+        } else {
+            console.log("Element with ID 'cart-items' not found.");
+        }
 
 
-    const placeOrderButton = document.getElementById('place-order-button');
-    if (placeOrderButton) {
-        placeOrderButton.addEventListener('click', function () {
-            if (cart.cart.length === 0) {
-                alert('Your cart is empty. Please add items to your cart before placing an order.');
-                jQuery('#cartModal').modal('hide');
+        const placeOrderButton = document.getElementById('place-order-button');
+        if (placeOrderButton) {
+            placeOrderButton.addEventListener('click', function () {
+                if (cart.cart.length === 0) {
+                    alert('your cart is empty')
+                    jQuery('#cartModal').modal('hide');
 
-                return;
-            }
+                    return;
+                }
 
-            if (!ajax_obj.current_user.display_name) {
-                // alert('you should be logged in before placing an order');
+                if (!ajax_obj.current_user.display_name) {
+                    // alert('you should be logged in before placing an order');
 
-                jQuery('#cartModal').modal('hide');
+                    jQuery('#cartModal').modal('hide');
 
                     jQuery('#auth-modal').fadeIn(100)
 
 
-                return
+                    return
 
-            }
-            const currentUser  = ajax_obj.current_user;
+                }
+                const currentUser = ajax_obj.current_user;
 
-            const confirmationDetails = document.getElementById('confirmation-details');
-            confirmationDetails.innerHTML = `
-                <strong>Name:</strong> ${currentUser .display_name}<br>
-                <strong>Email:</strong> ${currentUser .user_email}<br>
+                const confirmationDetails = document.getElementById('confirmation-details');
+                confirmationDetails.innerHTML = `
+                <strong>Name:</strong> ${currentUser.display_name}<br>
+                <strong>Email:</strong> ${currentUser.user_email}<br>
                 <strong>Products:</strong><br>
                 ${cart.cart.map(item => `${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('<br>')}
             `;
 
-            document.getElementById('products').value = JSON.stringify(cart.cart);
+                document.getElementById('products').value = JSON.stringify(cart.cart);
 
-            jQuery('#userDetailsModal').modal('show');
-        });
-    } else {
-        console.log("Element with ID 'place-order-button' not found.");
-    }
-
-    const confirmOrderButton = document.getElementById('confirm-order-button');
-    if (confirmOrderButton) {
-        confirmOrderButton.addEventListener('click', function () {
-
-            if (!ajax_obj.current_user.display_name) {
-                alert('you should be logged in before placing an order');
-                return
-            }
-
-            let products = JSON.parse(document.getElementById('products').value);
-            let totalAmount = products.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
-
-            const currentUser  = ajax_obj.current_user;
-
-            jQuery.ajax({
-                url: ajax_obj.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'create_order',
-                    full_name: currentUser .display_name,
-                    email: currentUser .user_email,
-                    products: JSON.stringify(products),
-                    total_amount: totalAmount,
-                },
-                success: function (response) {
-                    if (response.success) {
-                        console.log('AJAX request successful', response);
-                        cart.clearCart();
-                        alert('Order placed successfully!');
-                        jQuery('#userDetailsModal').modal('hide');
-                    } else {
-                        alert('Error: ' + response.data);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error while placing the order:', status, error);
-                    alert('An error occurred while placing the order. Please try again later.');
-                }
+                jQuery('#userDetailsModal').modal('show');
             });
-        });
-    } else {
-        console.log("Element with ID 'confirm-order-button' not found.");
+        } else {
+            console.log("Element with ID 'place-order-button' not found.");
+        }
+
+        const confirmOrderButton = document.getElementById('confirm-order-button');
+        if (confirmOrderButton) {
+            confirmOrderButton.addEventListener('click', function () {
+
+                if (!ajax_obj.current_user.display_name) {
+                    alert('you should be logged in before placing an order');
+                    return
+                }
+
+                let products = JSON.parse(document.getElementById('products').value);
+                let totalAmount = products.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+
+                const currentUser = ajax_obj.current_user;
+
+                jQuery.ajax({
+                    url: ajax_obj.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'create_order',
+                        full_name: currentUser.display_name,
+                        email: currentUser.user_email,
+                        products: JSON.stringify(products),
+                        total_amount: totalAmount,
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('AJAX request successful', response);
+                            cart.clearCart();
+                            alert('Order placed successfully!');
+                            jQuery('#userDetailsModal').modal('hide');
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error while placing the order:', status, error);
+                        alert('An error occurred while placing the order. Please try again later.');
+                    }
+                });
+            });
+
+        } else {
+            console.log("Element with ID 'confirm-order-button' not found.");
+        }
     }
-});
+)
+;
