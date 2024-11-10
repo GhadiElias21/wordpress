@@ -14,28 +14,24 @@ Text Domain: mytheme
     max-width: 300px;
     height: 350px;
     display: block;
-    margin: 0 auto; /* Center the image horizontally */
+    margin: 0 auto;
 }
 
-/* Add Flexbox to HTML and Body */
 html, body {
     height: 100%;
     margin: 0;
 }
 
-/* Container for the entire site */
 #page-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* Content Wrapper to push the footer to the bottom */
 #content-wrap {
     flex: 1;
 }
 
-/* Footer Styling */
 footer {
     background-color: #f1f1f1;
     padding: 20px;
@@ -50,19 +46,6 @@ footer {
 .modal-footer {
     border-top: 1px solid #dee2e6;
 }
-
-.list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.list-group-item img {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
-}
-
 
 .product-link {
     font-weight: bold;

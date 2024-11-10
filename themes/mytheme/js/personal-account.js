@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-    let userEmail = userData.email;
+    let userEmail = userData.email || {};
 
     $.ajax({
         url: userData.restUrl,
