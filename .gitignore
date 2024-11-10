@@ -1,7 +1,7 @@
-
+advanced-cache.php
 index.php
 /plugins/
-
+wp-cache-config.php
 /upgrade/
 /upgrade-temp-backup/
 /uploads/
@@ -9,3 +9,5 @@ index.php
 /themes/.idea/
 /.idea/
 /themes/phlox/
+/smush-webp/
+/cache/
