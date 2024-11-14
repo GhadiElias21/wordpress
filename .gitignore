@@ -9,5 +9,11 @@ wp-cache-config.php
 /themes/.idea/
 /.idea/
 /themes/phlox/
+/wflogs/
 /smush-webp/
+/languages/
 /cache/
+/updraft/
+
+/.vscode/
+jetpack-waf

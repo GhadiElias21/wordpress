@@ -1,5 +1,7 @@
 jQuery(document).ready(function($) {
     let userEmail = userData.email || {};
+    let exchangeRate = userData.exchangeRate || 1
+    const currencySymbol =userData.selectedCurrency === 'BYN' ? ' byn' : '$'; 
 
     $.ajax({
         url: userData.restUrl,
@@ -11,69 +13,54 @@ jQuery(document).ready(function($) {
             email: userEmail
         },
         success: function(response) {
-            let orderHistory = $('#order-history');
+            const orderHistory = $('#order-history');
             if (response.length === 0) {
-                orderHistory.html('<p class="no-orders">No orders found.</p>');
+                orderHistory.html(`<p class="no-orders">${userData.translations.no_orders}</p>`);
                 return;
             }
 
-            let orders = `
-                <ul class="list-group">
-            `;
-
-            $.each(response, function(index, order) {
-                let productItems = order.products.map(product => `
-                    <li>${product.name} (Quantity: ${product.quantity} , Price of 1 unit: $${product.price})</li>
+            const orders = response.map(order => {
+                const productItems = order.products.map(product => `
+                    <li class="total-amount">${product.name} (${userData.translations.quantity} ${product.quantity}, ${userData.translations.price} ${(product.price * exchangeRate).toFixed(2)}${currencySymbol})</li>
                 `).join('');
 
-                let statusClass;
-                switch (order.status.toLowerCase()) {
-                    case 'pending':
-                        statusClass = 'pending';
-                        break;
-                    case 'completed':
-                        statusClass = 'completed';
-                        break;
-                    case 'canceled':
-                        statusClass = 'canceled';
-                        break;
-                    default:
-                        statusClass = '';
-                }
+                const statusClass = getStatusClass(order.status.toLowerCase());
 
-                orders += `
+                return `
                     <li class="list-group-item">
                         <div class="details">
-                            <div class="order-title">Order ID:</div>
+                            <div class="order-title">${userData.translations.order_id}</div>
                             <div class="order-value">${order.order_id}</div>
                         </div>
                         <div class="details">
-                            <div class="order-title">Order Date:</div>
+                            <div class="order-title">${userData.translations.order_date}</div>
                             <div class="order-value">${order.order_date}</div>
                         </div>  
                         <div class="details">
-                            <div class="order-title">Total Amount:</div>
-                            <div class="order-value">$${order.total_amount}</div>
+                            <div class="order-title">${userData.translations.total_amount}</div>
+                            <div class="order-value total-amount">
+                                ${(order.total_amount * exchangeRate).toFixed(2) }${currencySymbol }
+                            </div>
                         </div>  
                         <div class="details status ${statusClass}">
-                            <div class="status-title">Status:</div>
-                            <div class="status-value">${ order.status }</div>
+                            <div class="status-title">${userData.translations.status}</div>
+                            <div class="status-value">${userData.translations[order.status.toLowerCase()]}</div>
                         </div>   
                         <div class="details">
-                            <div class="order-title">Products:</div>
+                            <div class="order-title">${userData.translations.products}</div>
                             <ul class="product-list">${productItems}</ul>      
                         </div>
                     </li>
                 `;
-            });
+            }).join('');
 
-            orders += '</ul>';
-            orderHistory.html(orders);
-        },
-        error: function(error) {
-            $('#order-history').html('<p>Failed to fetch orders.</p>');
-        }
-    });
+
+        orderHistory.html(`<ul class="list-group">${orders}</ul>`);
+    },
+    error: function(error) {
+        $('#order-history').html(`<p>${userData.translations.failed_to_fetch}</p>`);
+    }
+});
 
 function getStatusClass(status) {
     switch (status) {

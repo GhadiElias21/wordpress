@@ -7,8 +7,8 @@ Template Name: Product Page
     <div class="archive-section">
         <div class="product-archive">
             <div class="content-area">
-                <h1 class="widget-title">top rated products</h1>
-
+                <h1 class="widget-title"> <?php echo pll_e('top rated products') ?>
+                </h1>
             </div>
 
             <aside class="sidebar-area">
@@ -18,10 +18,6 @@ Template Name: Product Page
             </aside>
         </div>
         <div class="container">
-            <h1 class="text-center"><?php bloginfo('name'); ?></h1>
-            <p class="text-center"><?php bloginfo('description'); ?></p>
-
-            <h2 class="text-center my-4">Our nii Products</h2>
             <div class="row">
                 <?php
                 $args = array(
@@ -32,7 +28,7 @@ Template Name: Product Page
 
                 if ($product_query->have_posts()) :
                     while ($product_query->have_posts()) : $product_query->the_post(); ?>
-                        <?php get_template_part('includes/product','content')?>
+                        <?php get_template_part('includes/product', 'content') ?>
 
                     <?php endwhile;
                     wp_reset_postdata();
