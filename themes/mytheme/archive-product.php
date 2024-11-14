@@ -1,5 +1,8 @@
 <?php
 get_header();
+/*
+Template Name: Product Page
+*/
 ?>
     <div class="archive-section">
         <div class="product-archive">

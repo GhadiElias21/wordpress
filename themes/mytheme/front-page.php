@@ -1,4 +1,15 @@
-<?php get_header(); ?>
+
+<?php
+
+/*
+Template Name: Home Page
+*/
+
+get_header();
+
+
+?>
+
 <div class="jumbotron jumbotron-fluid text-center bg-dark text-white">
     <div >
         <h1 class="display-4"><?php bloginfo('name'); ?></h1>

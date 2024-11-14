@@ -74,4 +74,15 @@ jQuery(document).ready(function($) {
             $('#order-history').html('<p>Failed to fetch orders.</p>');
         }
     });
-});
+
+function getStatusClass(status) {
+    switch (status) {
+        case 'pending':
+            return 'pending';
+        case 'completed':
+            return 'completed';
+        case 'canceled':
+            return 'canceled';
+        default:
+            return '';
+    }}})
