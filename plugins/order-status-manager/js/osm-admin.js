@@ -3,6 +3,7 @@ jQuery(document).ready(function($) {
         let postId = $(this).data('post-id');
         let newStatus = $(this).val();
         let $select = $(this);
+
         $.ajax({
             url: ajax_obj.ajax_url,
             type: 'POST',
@@ -15,7 +16,6 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     alert(response.data);
-
                     switch (newStatus) {
                         case 'Pending':
                             $select.css('background-color', 'orange');

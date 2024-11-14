@@ -1,4 +1,5 @@
 <?php
+
 class Product_Rating_Widget extends WP_Widget {
 
     public function __construct() {
@@ -11,7 +12,7 @@ class Product_Rating_Widget extends WP_Widget {
 
     public function widget($args, $instance) {
         echo $args['before_widget'];
-
+        $current_language = pll_current_language();
 
         $query_args = array(
             'post_type' => 'product',
@@ -28,8 +29,11 @@ class Product_Rating_Widget extends WP_Widget {
             while ($query->have_posts()) {
                 $query->the_post();
                 $rating = get_post_meta(get_the_ID(), 'rating', true);
+                $product_name = $current_language == 'ru' ? get_field('name_russian') : get_field('name');
+                $color = $current_language == 'ru' ? get_field('color_russian') : get_field('color');
+
                 echo '<li class="top-rated-product">';
-                echo '<a href="' . get_permalink() . '" class="product-link">' . get_the_title() . '</a>';
+                echo '<a href="' . get_permalink() . '" class="product-link">' . $color . ' ' .  $product_name . '</a>';
                 echo '<span class="product-rating">'  . esc_html(number_format($rating,1)  ) . ' ★ </span>';
                 echo '</li>';
             }

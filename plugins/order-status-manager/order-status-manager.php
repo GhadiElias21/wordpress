@@ -5,7 +5,7 @@ Description: A plugin to manage order statuses.
 Version: 1.0
 Author: ghadghoud
 */
-include_once plugin_dir_path(__FILE__) . 'order-status-functions.php'; // Include the new file
+include_once plugin_dir_path(__FILE__) . 'order-status-functions.php';
 add_action('init', 'osm_check_order_post_type');
 function osm_check_order_post_type()
 {
@@ -41,17 +41,22 @@ function osm_enqueue_scripts() {
     ));
 }
 add_action('wp_ajax_update_order_status', 'osm_update_order_status');
-function osm_update_order_status()
-{
+function osm_update_order_status() {
     check_ajax_referer('osm_nonce', 'nonce');
 
     $post_id = intval($_POST['post_id']);
-
     $new_status = sanitize_text_field($_POST['status']);
 
-    if (update_post_meta($post_id, 'order_status', $new_status)) {
-        wp_send_json_success('Order status updated successfully.');
 
+    $updated_post = array(
+        'ID' => $post_id,
+        'post_status' => strtolower($new_status)
+    );
+
+
+    if (wp_update_post($updated_post)) {
+        update_post_meta($post_id, 'order_status', $new_status);
+        wp_send_json_success('Order status updated successfully.');
     } else {
         wp_send_json_error('Failed to update order status.');
     }

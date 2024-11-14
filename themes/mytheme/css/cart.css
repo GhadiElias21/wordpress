@@ -1,0 +1,41 @@
+.cart-container {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-container .badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+}
+
+#cart-items .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#cart-items .list-group-item span {
+    flex: 1;
+}
+
+#cart-items .list-group-item button {
+    margin-left: 10px;
+}
+.cart-item {
+    background-color: #fff;
+    transition: box-shadow 0.3s;
+}
+
+.cart-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item img {
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.nav-item{
+    text-decoration: none;
+}
