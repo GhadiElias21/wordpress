@@ -14,8 +14,8 @@ add_action('after_setup_theme', 'mytheme_setup');
 function enqueue_styles()
 {
     wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css');
-    wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), null, true);
-    wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css', array(), null);
+    wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array('jquery'), '', true);
+    wp_enqueue_style('bootstrap-icons', 'https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css');
     wp_enqueue_style('custom-style', get_template_directory_uri() . '/style.css');
     wp_enqueue_style('custom-menu-styles', get_template_directory_uri() . '/custom-menu-styles.css');
      wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
@@ -43,10 +43,13 @@ function enqueue_custom_scripts() {
             null,
             true
         );
-        wp_localize_script('shopping-cart', 'ajax_obj', array(
-            'ajax_url' => admin_url('admin-ajax.php')
-        ));
-
+    wp_localize_script('shopping-cart', 'ajax_obj', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'current_user' => array(
+            'display_name' => is_user_logged_in() ? wp_get_current_user()->display_name : '',
+            'user_email' => is_user_logged_in() ? wp_get_current_user()->user_email : ''
+        )
+    ));
 }
 add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 
@@ -74,7 +77,6 @@ function handle_add_to_cart()
 
         $_SESSION['cart'] = $cart;
 
-        // Return the updated cart count
         wp_send_json_success(array(
             'cart_count' => count($cart),
         ));
@@ -117,9 +119,6 @@ function handle_update_cart()
 
 add_action('wp_ajax_update_cart', 'handle_update_cart');
 add_action('wp_ajax_nopriv_update_cart', 'handle_update_cart');
-
-
-// Handle removing items from the cart
 function handle_remove_from_cart()
 {
     if (isset($_POST['productId'])) {
@@ -319,3 +318,5 @@ function register_product_rating_widget() {
 }
 add_action( 'widgets_init', 'register_product_rating_widget' );
 ?>
+
+

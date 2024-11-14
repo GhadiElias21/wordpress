@@ -1,152 +1,149 @@
+
 class ShoppingCart {
-        constructor() {
-            this.cart = this.loadCart() || [];
-            this.updateCartCount();
-            this.updateCartTotal();
-            this.renderCartItems();
+    constructor() {
+        this.cart = this.loadCart() || [];
+        this.updateCartCount();
+        this.updateCartTotal();
+        this.renderCartItems();
+    }
 
+    loadCart() {
+        const cartData = this.getCookie('shoppingCart');
+        return cartData ? JSON.parse(cartData) : [];
+    }
+
+    saveCart() {
+        this.setCookie('shoppingCart', JSON.stringify(this.cart), 7);
+    }
+
+    setCookie(name, value, days) {
+        let expires = '';
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = `; expires=${date.toUTCString()}`;
         }
+        document.cookie = `${name}=${(value || '')}${expires}; path=/`;
+    }
 
-        loadCart() {
-            const cartData = this.getCookie('shoppingCart');
-            return cartData ? JSON.parse(cartData) : [];
+    getCookie(name) {
+        const nameEQ = `${name}=`;
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
+        return null;
+    }
 
-        saveCart() {
-            this.setCookie('shoppingCart', JSON.stringify(this.cart), 7);
-        }
-
-        setCookie(name, value, days) {
-            let expires = '';
-            if (days) {
-                const date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = `; expires=${date.toUTCString()}`;
+    addItem(product) {
+        jQuery.ajax({
+            url: ajax_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'add_to_cart',
+                product: product
+            },
+            success: (response) => {
+                if (response.success) {
+                    const existingProduct = this.cart.find(item => item.id === product.id);
+                    if (existingProduct) {
+                        existingProduct.quantity += 1;
+                    } else {
+                        product.quantity = 1;
+                        this.cart.push(product);
+                    }
+                    this.updateCart();
+                } else {
+                    alert('Failed to add item to cart: ' + response.data);
+                }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error adding item to cart:', status, error);
+                alert('An error occurred while adding the item to the cart. Please try again later.');
             }
-            document.cookie = `${name}=${(value || '')}${expires}; path=/`;
-        }
+        });
+    }
 
-        getCookie(name) {
-            const nameEQ = `${name}=`;
-            const ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i].trim();
-                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-            }
-            return null;
-        }
-
-        addItem(product) {
+    changeQuantity(productId, quantity) {
+        if (quantity < 1) {
+            this.removeItem(productId);
+        } else {
             jQuery.ajax({
                 url: ajax_obj.ajax_url,
                 type: 'POST',
                 data: {
-                    action: 'add_to_cart',
-                    product: product
+                    action: 'update_cart',
+                    productId: productId,
+                    quantity: quantity
                 },
                 success: (response) => {
                     if (response.success) {
-                        const existingProduct = this.cart.find(item => item.id === product.id);
-                        if (existingProduct) {
-                            existingProduct.quantity += 1;
-                        } else {
-                            product.quantity = 1;
-                            this.cart.push(product);
+                        const product = this.cart.find(item => item.id === productId);
+                        if (product) {
+                            product.quantity = quantity;
                         }
                         this.updateCart();
                     } else {
-                        alert('Failed to add item to cart: ' + response.data);
+                        alert('Failed to change the quantity: ' + response.data);
                     }
                 },
                 error: (xhr, status, error) => {
-                    console.error('Error adding item to cart:', status, error);
-                    alert('An error occurred while adding the item to the cart. Please try again later.');
+                    console.error('Error while changing the item quantity:', status, error);
+                    alert('An error occurred while updating the item quantity. Please try again later.');
                 }
             });
         }
+    }
 
-        changeQuantity(productId, quantity) {
-            // Ensure quantity is not less than zero
-            if (quantity < 1) {
-                // Remove the item from the cart if quantity is 0 or less
-                this.removeItem(productId);
-            } else {
-                jQuery.ajax({
-                    url: ajax_obj.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'update_cart',
-                        productId: productId,
-                        quantity: quantity
-                    },
-                    success: (response) => {
-                        if (response.success) {
-                            const product = this.cart.find(item => item.id === productId);
-                            if (product) {
-                                product.quantity = quantity;
-                            }
-                            this.updateCart();
-                        } else {
-                            alert('Failed to change the quantity: ' + response.data);
-                        }
-                    },
-                    error: (xhr, status, error) => {
-                        console.error('Error while changing the item quanitity:', status, error);
-                        alert('An error occurred while adding the item to the cart. Please try again later.');
-                    }
-                });
+    removeItem(productId) {
+        jQuery.ajax({
+            url: ajax_obj.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'remove_from_cart',
+                productId: productId
+            },
+            success: (response) => {
+                if (response.success) {
+                    this.cart = this.cart.filter(item => item.id !== productId);
+                    this.updateCart();
+                } else {
+                    alert('Failed to remove the item: ' + response.data);
+                }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error while removing an item:', status, error);
+                alert('An error occurred while removing an item. Please try again later.');
             }
-        }
+        });
+    }
 
+    calculateTotal() {
+        return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+    }
 
-        removeItem(productId) {
-            jQuery.ajax({
-                url: ajax_obj.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'remove_from_cart',
-                    productId: productId
-                },
-                success: (response) => {
-                    if (response.success) {
-                        this.cart = this.cart.filter(item => item.id !== productId);
-                        this.updateCart();
-                    } else {
-                        alert('Failed to remove the item: ' + response.data);
-                    }
-                },
-                error: (xhr, status, error) => {
-                    console.error('Error while removing an item:', status, error);
-                    alert('An error occurred while removing an item. Please try again later.');
-                }
-            });
-        }
+    getItemCount() {
+        return this.cart.reduce((count, item) => count + item.quantity, 0);
+    }
 
-        calculateTotal() {
-            return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
-        }
+    updateCart() {
+        this.saveCart();
+        this.updateCartCount();
+        this.updateCartTotal();
+        this.renderCartItems();
+    }
 
-        getItemCount() {
-            return this.cart.reduce((count, item) => count + item.quantity, 0);
-        }
+    deleteCookie(name) {
+        this.setCookie(name, '', -1);
+    }
 
-        updateCart() {
-            this.saveCart();
-            this.updateCartCount();
-            this.updateCartTotal();
-            this.renderCartItems();
-        }
-
-        deleteCookie(name) {
-            this.setCookie(name, '', -1); // Set the cookie with an expiration date in the past
-        }
-
-        clearCart() {
-            this.cart = [];
-            this.deleteCookie('shoppingCart');
-            this.updateCart();
-            jQuery('#cartModal').modal('hide');
-        }
+    clearCart() {
+        this.cart = [];
+        this.deleteCookie('shoppingCart');
+        this.updateCart();
+        jQuery('#cartModal').modal('hide');
+    }
 
     updateCartCount() {
         const count = this.getItemCount();
@@ -157,7 +154,6 @@ class ShoppingCart {
             cartCount.classList.toggle('badge-success', count > 0);
         } else {
             console.log("Element with ID 'cart-count' not found.");
-
         }
     }
 
@@ -183,31 +179,32 @@ class ShoppingCart {
             cartItems.innerHTML = '<li class="list-group-item">Your cart is empty.</li>';
             return;
         }
-            this.cart.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.innerHTML = `
-    <div class="cart-item d-flex align-items-center p-3 border rounded shadow-sm mb-2 bg-light w-100">
-   <a href=${item.link}><img  src="${item.image}" alt="${item.name}" class="img-fluid rounded" style="width: 70px; height: 70px; margin-right: 15px; border-radius: 5px;"/></a> 
-        <span class="flex-grow-1">${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</span>
-        <div class="btn-group ml-auto" role="group" aria-label="Change quantity of ${item.name}">
-            <button class="btn btn-sm btn-outline-secondary change-quantity" data-id="${item.id}" data-action="decrease" aria-label="Decrease quantity of ${item.name}">-</button>
-            <button class="btn btn-sm btn-outline-secondary change-quantity" data-id="${item.id}" data-action="increase" aria-label="Increase quantity of ${item.name}">+</button>
-            <button class="btn btn-sm btn-danger remove-item" data-id="${item.id}" aria-label="Remove ${item.name} from cart">&times;</button>
-        </div>
-    </div>
-`;
-
-                cartItems.appendChild(li);
-            });
-        }
-
+        this.cart.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = `
+                <div class="cart-item d-flex align-items-center p-3 border rounded shadow-sm mb-2 bg-light w-100">
+                    <a href="${item.link}"><img src="${item.image}" alt="${item.name}" class="img-fluid rounded" style="width: 70px; height: 70px; margin-right: 15px; border-radius: 5px;"/></a> 
+                    <span class="flex-grow-1">${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}</span>
+                    <div class="btn-group ml-auto" role="group" aria-label="Change quantity of ${item.name}">
+                        <button class="btn btn-sm btn-outline-secondary change-quantity" data-id="${item.id}" data-action="decrease" aria-label="Decrease quantity of ${item.name}">-</button>
+                        <button class="btn btn-sm btn-outline-secondary change-quantity" data-id="${item.id}" data-action="increase" aria-label="Increase quantity of ${item.name}">+</button>
+                        <button class="btn btn-sm btn-danger remove-item" data-id="${item.id}" aria-label="Remove ${item.name} from cart">&times;</button>
+                    </div>
+                </div>
+            `;
+            cartItems.appendChild(li);
+        });
     }
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const cart = new ShoppingCart();
+    const toastTrigger = document.getElementById('liveToastBtn')
+    const toastLiveExample = document.getElementById('liveToast')
 
-    // Event listener for all "Add to Cart" buttons
+
+    console.log(ajax_obj.current_user.display_name)
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', function () {
             const productId = this.getAttribute('data-id');
@@ -227,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Event delegation for quantity change and remove buttons
     const cartItemsElement = document.getElementById('cart-items');
     if (cartItemsElement) {
         cartItemsElement.addEventListener('click', function (event) {
@@ -238,8 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const action = target.getAttribute('data-action');
 
                 if (action === 'increase') {
-                    cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity + 1);
-                } else if (action === 'decrease') {
+                    cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity + 1);                } else if (action === 'decrease') {
                     cart.changeQuantity(productId, cart.cart.find(item => item.id === productId).quantity - 1);
                 }
             }
@@ -253,48 +248,67 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("Element with ID 'cart-items' not found.");
     }
 
+
     const placeOrderButton = document.getElementById('place-order-button');
     if (placeOrderButton) {
         placeOrderButton.addEventListener('click', function () {
             if (cart.cart.length === 0) {
                 alert('Your cart is empty. Please add items to your cart before placing an order.');
+                jQuery('#cartModal').modal('hide');
+
                 return;
             }
 
-            const productData = cart.cart.map(item => {
-                return `${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`;
-            }).join('\n'); // Join with new line for better readability
+            if (!ajax_obj.current_user.display_name) {
+                // alert('you should be logged in before placing an order');
+
+                jQuery('#cartModal').modal('hide');
+
+                    jQuery('#auth-modal').fadeIn(100)
+
+
+                return
+
+            }
+            const currentUser  = ajax_obj.current_user;
+
+            const confirmationDetails = document.getElementById('confirmation-details');
+            confirmationDetails.innerHTML = `
+                <strong>Name:</strong> ${currentUser .display_name}<br>
+                <strong>Email:</strong> ${currentUser .user_email}<br>
+                <strong>Products:</strong><br>
+                ${cart.cart.map(item => `${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join('<br>')}
+            `;
 
             document.getElementById('products').value = JSON.stringify(cart.cart);
+
             jQuery('#userDetailsModal').modal('show');
         });
     } else {
         console.log("Element with ID 'place-order-button' not found.");
     }
 
-    const orderForm = document.getElementById('order-form');
-    if (orderForm) {
-        orderForm.addEventListener('submit', function (e) {
-            e.preventDefault();
+    const confirmOrderButton = document.getElementById('confirm-order-button');
+    if (confirmOrderButton) {
+        confirmOrderButton.addEventListener('click', function () {
 
-            let fullName = document.getElementById('full_name').value.trim();
-            let email = document.getElementById('email').value;
-
-            if (fullName === '') {
-                alert('Full Name cannot be empty.');
-                return;
+            if (!ajax_obj.current_user.display_name) {
+                alert('you should be logged in before placing an order');
+                return
             }
 
             let products = JSON.parse(document.getElementById('products').value);
             let totalAmount = products.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+
+            const currentUser  = ajax_obj.current_user;
 
             jQuery.ajax({
                 url: ajax_obj.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'create_order',
-                    full_name: fullName,
-                    email: email,
+                    full_name: currentUser .display_name,
+                    email: currentUser .user_email,
                     products: JSON.stringify(products),
                     total_amount: totalAmount,
                 },
@@ -304,19 +318,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         cart.clearCart();
                         alert('Order placed successfully!');
                         jQuery('#userDetailsModal').modal('hide');
-                        orderForm.reset();
                     } else {
                         alert('Error: ' + response.data);
                     }
                 },
                 error: function (xhr, status, error) {
-                    alert(error);
+                    console.error('Error while placing the order:', status, error);
+                    alert('An error occurred while placing the order. Please try again later.');
                 }
             });
         });
     } else {
-
-        console.log("Element with ID 'order-form' not found.");
-
+        console.log("Element with ID 'confirm-order-button' not found.");
     }
 });
